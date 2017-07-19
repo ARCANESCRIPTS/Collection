@@ -18,13 +18,13 @@ Feel free to check out the [releases][link_releases], [license][link_license], a
 You can install the package via the `npm` command:
 
 ```bash
-npm install laravel-collect --save
+npm install laravel-collection --save
 ```
 
 With `yarn`:
 
 ```bash
-yarn add laravel-collect
+yarn add laravel-collection
 ```
 
 ## Available methods :

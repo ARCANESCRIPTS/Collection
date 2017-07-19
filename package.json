@@ -6,10 +6,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git://github.com/ARCANESCRIPT/Collection.git"
+        "url": "git://github.com/ARCANESCRIPTS/Collection.git"
     },
     "bugs": {
-        "url": "https://github.com/ARCANESCRIPT/Collection/issues"
+        "url": "https://github.com/ARCANESCRIPTS/Collection/issues"
     },
     "main": "dist/Collect.js",
     "scripts": {

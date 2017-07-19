@@ -6,6 +6,3 @@ node_js:
 script:
   - npm run build
   - npm run test-cc
-
-after_success: 
-  - npm run coveralls

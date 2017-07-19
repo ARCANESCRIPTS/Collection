@@ -6,3 +6,7 @@ node_js:
 script:
   - npm run build
   - npm run test-cc
+
+after_success:
+  - cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage
+  - rm -rf ./coverage

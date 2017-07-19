@@ -135,15 +135,15 @@ class Collection implements CollectionInterface
      */
     contains(key: any, value?: any): boolean {
         if (value !== undefined)
-            return this.items[key] !== undefined && this.items[key] === value;
+            return this.items.hasOwnProperty(key) && this.items[key] === value;
 
         if (typeof key === 'function')
             return (this.items.filter((item, index) => key(item, index)).length > 0);
 
         if (this.isArray())
-            return this.items.indexOf(key) !== -1;
+            return this.items.indexOf(key) !== -1 || this.items.includes(key);
 
-        return this.items[key] !== undefined;
+        return this.items.hasOwnProperty(key) || this.values().toArray().includes(key);
     }
 
     /**

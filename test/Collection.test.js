@@ -186,6 +186,16 @@ describe('#contains()', () => {
         expect(collection.contains((value) => value > 5)).toBeFalsy();
         expect(collection.contains(4)).toBeTruthy();
     });
+
+    it('should return whether the collection contains a given item #4', () => {
+        let collection = new Collection({'name': 'Desk', 'price': 100});
+
+        expect(collection.contains('Desk')).toBeTruthy();
+        expect(collection.contains(100)).toBeTruthy();
+
+        expect(collection.contains('New York')).toBeFalsy();
+        expect(collection.contains(400)).toBeFalsy();
+    });
 });
 
 describe('#count()', () => {

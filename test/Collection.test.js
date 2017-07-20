@@ -161,9 +161,12 @@ describe('#contains()', () => {
             name: 'Steven Gerrard'
         });
 
-        expect(collection.contains('id')).toBeTruthy();
-        expect(collection.contains('name')).toBeTruthy();
-        expect(collection.contains('age')).toBeFalsy();
+
+        expect(collection.contains(8)).toBeTruthy();
+        expect(collection.contains('Steven Gerrard')).toBeTruthy();
+
+        expect(collection.contains('id')).toBeFalsy();
+        expect(collection.contains('name')).toBeFalsy();
     });
 
     it('should return whether the collection contains a given item #2', () => {
@@ -195,6 +198,21 @@ describe('#contains()', () => {
 
         expect(collection.contains('New York')).toBeFalsy();
         expect(collection.contains(400)).toBeFalsy();
+    });
+
+    it('should return whether the collection contains a given item #5', () => {
+        let collection = new Collection([
+            {'product': 'Desk', 'price': 200},
+            {'product': 'Chair', 'price': 100}
+        ]);
+
+        expect(collection.contains('product', 'Desk')).toBeTruthy();
+        expect(collection.contains('product', 'Chair')).toBeTruthy();
+        expect(collection.contains('product', 'Bookcase')).toBeFalsy();
+
+        expect(collection.contains('price', 200)).toBeTruthy();
+        expect(collection.contains('price', 100)).toBeTruthy();
+        expect(collection.contains('price', 50)).toBeFalsy();
     });
 });
 
@@ -395,14 +413,43 @@ describe('#first()', () => {
 });
 
 describe('#flatMap()', () => {
-    it('should iterate through the collection and passes each value to the given callback', () => {
-        const collection = new Collection(dataset.persons);
+    it('should map and collapse the items #1', () => {
+        let data = new Collection([
+            {'name': 'taylor', 'hobbies': ['programming', 'basketball']},
+            {'name': 'adam', 'hobbies': ['music', 'powerlifting']},
+        ]);
 
-        const flatMapped = collection.flatMap((values) => values.map((value) => value.toUpperCase()));
+        data = data.flatMap(person => person['hobbies']);
 
-        expect(flatMapped.all()).toEqual({'1': 'JOHN', '2': 'JANE', '3': 'BOB'});
+        expect(data.all()).toEqual(['programming', 'basketball', 'music', 'powerlifting']);
+    });
 
-        expect(collection.all()).toEqual(dataset.persons);
+    it('should map and collapse the items #2', () => {
+        let collection = new Collection([
+            {'name': 'Sally'},
+            {'school': 'Arkansas'},
+            {'age': 28}
+        ]);
+
+        let flattened = collection.flatMap(values => {
+            let obj = Object.assign({}, values);
+
+            Object.keys(obj).map((k) => {
+                let value = obj[k];
+                if (typeof value === 'string')
+                    obj[k] = value.toUpperCase();
+            });
+
+            return obj;
+        });
+
+        expect(flattened.all()).toEqual({'name': 'SALLY', 'school': 'ARKANSAS', 'age': 28});
+        expect(collection.all()).toEqual([
+            {'name': 'Sally'},
+            {'school': 'Arkansas'},
+            {'age': 28}
+        ]);
+        // {'name': 'SALLY', 'school': 'ARKANSAS', 'age': '28'}
     });
 });
 
@@ -1500,14 +1547,14 @@ describe('#split()', () => {
 });
 
 describe('#sum()', () => {
-    it('can calculate the sum: array of items', () => {
+    it('can calculate the sum #1', () => {
         const collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
         expect(collection).toBeInstanceOf(Collection);
         expect(collection.sum()).toEqual(55);
     });
 
-    it('can calculate the sum: object of items', () => {
+    it('can calculate the sum #2', () => {
         const collection = new Collection([
             {'name': 'Product 1', 'price': 10},
             {'name': 'Product 2', 'price': 20},
@@ -1516,6 +1563,16 @@ describe('#sum()', () => {
 
         expect(collection).toBeInstanceOf(Collection);
         expect(collection.sum('price')).toEqual(60);
+    });
+
+    it('can calculate the sum #3', () => {
+        let collection = new Collection([
+            {'name': 'Chair', 'colors': ['Black']},
+            {'name': 'Desk', 'colors': ['Black', 'Mahogany']},
+            {'name': 'Bookcase', 'colors': ['Red', 'Beige', 'Brown']},
+        ]);
+
+        expect(collection.sum((product) => product['colors'].length)).toEqual(6);
     });
 });
 
@@ -1589,7 +1646,7 @@ describe('#toJson()', () => {
 
 describe('#times()', () => {
     it('should create a new collection with a given amount of times', () => {
-        const collection = Collection.make().times(10);
+        const collection = Collection.times(10);
 
         expect(collection.all()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
@@ -1597,13 +1654,13 @@ describe('#times()', () => {
     it('should create a new empty collection if the given number is incorrect', () => {
         let expected = [];
 
-        expect(Collection.make().times(true).all()).toEqual(expected);
-        expect(Collection.make().times(0).all()).toEqual(expected);
-        expect(Collection.make().times(-10).all()).toEqual(expected);
+        expect(Collection.times(true).all()).toEqual(expected);
+        expect(Collection.times(0).all()).toEqual(expected);
+        expect(Collection.times(-10).all()).toEqual(expected);
     });
 
     it('should create a new collection by invoking the callback a given amount of times', () => {
-        const collection = Collection.make().times(10, (number) => number * 9);
+        const collection = Collection.times(10, (number) => number * 9);
 
         expect(collection.all()).toEqual([9, 18, 27, 36, 45, 54, 63, 72, 81, 90]);
     });

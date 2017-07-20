@@ -63,11 +63,12 @@ interface CollectionInterface
      * Check the collection contains an item.
      *
      * @param  {any}  key
+     * @param  {any}  operator
      * @param  {any}  value
      *
      * @return {boolean}
      */
-    contains(key: string, value: any): boolean;
+    contains(key: any, operator?: any, value?: any): boolean;
 
     /**
      * Count the number of items in the collection.

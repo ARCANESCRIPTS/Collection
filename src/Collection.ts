@@ -81,9 +81,11 @@ class Collection implements CollectionInterface
      * @return {Collection}
      */
     collapse(): Collection {
-        return Collection.make(
-            [].concat(...this.items)
-        );
+        let items = this.every((item) => Array.isArray(item))
+            ? [].concat(...this.items)
+            : _.assign({}, ...this.items);
+
+        return Collection.make(items);
     }
 
     /**
@@ -129,21 +131,31 @@ class Collection implements CollectionInterface
      * Check the collection contains an item.
      *
      * @param  {any}  key
+     * @param  {any}  operator
      * @param  {any}  value
      *
      * @return {boolean}
      */
-    contains(key: any, value?: any): boolean {
-        if (value !== undefined)
-            return this.items.hasOwnProperty(key) && this.items[key] === value;
+    contains(key: any, operator?: any, value?: any): boolean {
+        if (operator === undefined && value === undefined) {
+            if (this.isCallable(key)) {
+                for (let k of Object.keys(this.items)) {
+                    if (key(this.items, k))
+                        return true;
+                }
 
-        if (typeof key === 'function')
-            return (this.items.filter((item, index) => key(item, index)).length > 0);
+                return this.first(key) !== null;
+            }
 
-        if (this.isArray())
-            return this.items.indexOf(key) !== -1 || this.items.includes(key);
+            return this.values().toArray().includes(key);
+        }
 
-        return this.items.hasOwnProperty(key) || this.values().toArray().includes(key);
+        if (operator !== undefined && value === undefined) {
+            value = operator;
+            operator = '=';
+        }
+
+        return this.contains(this.operatorForWhere(key, operator, value));
     }
 
     /**
@@ -191,9 +203,15 @@ class Collection implements CollectionInterface
      * @return {Collection}
      */
     each(callback: any): Collection {
-        _.forEach(this.items, (value, key) => {
-            callback(value, key, this.items);
-        });
+        const BreakException = {};
+
+        try {
+            _.forEach(this.items, (value, key) => {
+                if (callback(value, key, this.items) === false)
+                    throw BreakException;
+            });
+        }
+        catch (e) {} // Do nothing...
 
         return this;
     }
@@ -261,7 +279,10 @@ class Collection implements CollectionInterface
     first(callback?: any): any {
         let keys = Object.keys(this.items);
 
-        if (typeof callback === 'function') {
+        if (callback === undefined)
+            return this.items[keys[0]];
+
+        if (this.isCallable(callback)) {
             for (let key of keys) {
                 if (callback(this.items[key], key)) {
                     return this.items[key];
@@ -269,7 +290,7 @@ class Collection implements CollectionInterface
             }
         }
 
-        return this.items[keys[0]];
+        return null;
     }
 
     /**
@@ -280,20 +301,7 @@ class Collection implements CollectionInterface
      * @return {Collection}
      */
     flatMap(callback: any): Collection {
-        const values = [];
-
-        Object.keys(this.items).forEach((property) => {
-            values.push(this.items[property]);
-        });
-
-        const newValues  = callback(values);
-        const collection = {};
-
-        Object.keys(this.items).forEach((value, index) => {
-            collection[value] = newValues[index];
-        });
-
-        return Collection.make(collection);
+        return this.map(callback).collapse();
     };
 
     /**
@@ -409,7 +417,7 @@ class Collection implements CollectionInterface
         if (this.has(key))
             return this.items[key];
 
-        return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
+        return this.isCallable(defaultValue) ? defaultValue() : defaultValue;
     }
 
     /**
@@ -425,7 +433,7 @@ class Collection implements CollectionInterface
         this.each((item, index) => {
             let resolvedKey;
 
-            resolvedKey = typeof key === 'function' ? key(item, index) : item[key];
+            resolvedKey = this.isCallable(key) ? key(item, index) : item[key];
 
             if (collection[resolvedKey] === undefined)
                 collection[resolvedKey] = [];
@@ -511,7 +519,7 @@ class Collection implements CollectionInterface
         const collection = {};
 
         this.each(item => {
-            collection[typeof key === 'function' ? key(item) : item[key]] = item;
+            collection[this.isCallable(key) ? key(item) : item[key]] = item;
         });
 
         return Collection.make(collection);
@@ -536,7 +544,7 @@ class Collection implements CollectionInterface
      * @return {any}
      */
     last(callback?: any): any {
-        let items = (typeof callback === 'function') ? this.filter(callback) : this;
+        let items = this.isCallable(callback) ? this.filter(callback) : this;
 
         return items.isArray()
             ? _.last(items.toArray())
@@ -572,16 +580,11 @@ class Collection implements CollectionInterface
      * @return {Collection}
      */
     map(callback: any): Collection {
-        let items = {};
-
-        if (this.isArray())
-            items = this.items.map(callback);
-        else
-            this.each((value, key) => {
-                items[key] = callback(value, key);
-            });
-
-        return Collection.make(items);
+        return Collection.make(
+            this.isArray()
+                ? this.items.map(callback)
+                : _.mapValues(this.items, (value, key) => callback(value, key))
+        );
     }
 
     /**
@@ -822,13 +825,12 @@ class Collection implements CollectionInterface
      * @return {Collection}
      */
     prepend(value: any, key?: any): Collection {
-        if (key === undefined) {
-            this.items = [value, ...this.items];
+        if (key !== undefined)
+            return this.put(key, value); // Order in javascript is screwed ¯\_(ツ)_/¯
 
-            return this;
-        }
+        this.items = [value, ...this.items];
 
-        return this.put(key, value);
+        return this;
     }
 
     /**
@@ -940,7 +942,7 @@ class Collection implements CollectionInterface
      * @return {any}
      */
     search(condition: any, strict: boolean = false): any {
-        let value = typeof condition === 'function'
+        let value = this.isCallable(condition)
             ? this.items.filter((value, key) => condition(value, key))[0]
             : condition;
 
@@ -1015,7 +1017,7 @@ class Collection implements CollectionInterface
      */
     sortBy(callback: any): Collection {
         const collection = [].concat(this.items);
-        const condition  = typeof callback === 'function'
+        const condition  = this.isCallable(callback)
             ? (a, b) => {
                 if (callback(a) < callback(b)) return -1;
                 if (callback(a) > callback(b)) return 1;
@@ -1086,9 +1088,12 @@ class Collection implements CollectionInterface
      * @return {number}
      */
     sum(key?: any): number {
-        return key === undefined && this.isArray()
-            ? _.sum(this.items)
-            : this.reduce((carry, item) => carry + item[key]);
+        if (key === undefined && this.isArray())
+            return _.sum(this.items);
+        else if (this.isCallable(key))
+            return _.sumBy(this.items, key);
+
+        return this.reduce((carry, item) => carry + item[key]);
     }
 
     /**
@@ -1125,7 +1130,7 @@ class Collection implements CollectionInterface
      *
      * @return {Collection}
      */
-    times(n: number, callback?: any): Collection {
+    static times(n: number, callback?: any): Collection {
         if (typeof n !== 'number' || n < 1)
             return new Collection;
 
@@ -1196,7 +1201,7 @@ class Collection implements CollectionInterface
         const usedKeys = [];
 
         for (let item of items) {
-            let uniqueKey = typeof key === 'function' ? key(item) : item[key];
+            let uniqueKey = this.isCallable(key) ? key(item) : item[key];
 
             if (usedKeys.indexOf(uniqueKey) === -1) {
                 collection.push(item);
@@ -1233,7 +1238,7 @@ class Collection implements CollectionInterface
     when(value: any, callback: Function, defaultCallback?: any): Collection {
         if (value)
             return callback(this);
-        else if (typeof defaultCallback === 'function')
+        else if (this.isCallable(defaultCallback))
             return defaultCallback(this);
 
         return this;
@@ -1302,7 +1307,7 @@ class Collection implements CollectionInterface
      * @return {boolean}
      */
     protected isArray(): boolean {
-        return _.isArray(this.items);
+        return Array.isArray(this.items);
     }
 
     /**
@@ -1314,8 +1319,7 @@ class Collection implements CollectionInterface
      *
      * @return {Function}
      */
-    protected operatorForWhere(key, operator, value): Function
-    {
+    protected operatorForWhere(key, operator, value): Function {
         return (item) => {
             const retrieved = item[key];
 
@@ -1348,6 +1352,17 @@ class Collection implements CollectionInterface
                     return retrieved == value;
             }
         };
+    }
+
+    /**
+     * Check if the given object is callable.
+     *
+     * @param  {any}  value
+     *
+     * @return {boolean}
+     */
+    protected isCallable(value: any): boolean {
+        return typeof value === 'function';
     }
 }
 

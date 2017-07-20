@@ -1614,8 +1614,8 @@ If you discover any security related issues, please email arcanedev.maroc@gmail.
 
 [badge_license]:   https://img.shields.io/npm/l/laravel-collection.svg?style=flat-square
 [badge_build]:     https://img.shields.io/travis/ARCANESCRIPTS/Collection/master.svg?style=flat-square
-[badge_grade]:     https://img.shields.io/codacy/grade/[id].svg?style=flat-square
-[badge_coverage]:  https://img.shields.io/codacy/coverage/[id]/master.svg?style=flat-square
+[badge_grade]:     https://img.shields.io/codacy/grade/f67b36ee155843a8a485adcd471f4484.svg?style=flat-square
+[badge_coverage]:  https://img.shields.io/codacy/coverage/f67b36ee155843a8a485adcd471f4484/master.svg?style=flat-square
 [badge_npm]:       https://img.shields.io/badge/npm-%E2%9C%93-brightgreen.svg?style=flat-square
 [badge_release]:   https://img.shields.io/npm/v/laravel-collection.svg?style=flat-square
 [badge_downloads]: https://img.shields.io/npm/dt/laravel-collection.svg?style=flat-square

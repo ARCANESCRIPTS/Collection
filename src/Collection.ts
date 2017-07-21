@@ -1,6 +1,5 @@
 import CollectionInterface from './CollectionInterface';
 import * as _ from 'lodash';
-import {type} from "os";
 
 class Collection implements CollectionInterface
 {
@@ -447,7 +446,7 @@ class Collection implements CollectionInterface
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param  {any}  key
+     * @param  {any}  keys
      *
      * @return {boolean}
      */
@@ -568,7 +567,7 @@ class Collection implements CollectionInterface
      *
      * @return {Collection}
      */
-    static make(items?: any) : Collection {
+    static make(items?: any): Collection {
         return new Collection(items);
     }
 
@@ -650,7 +649,7 @@ class Collection implements CollectionInterface
     /**
      * Merge the collection with the given items.
      *
-     * @param  {any}  obj
+     * @param  {any}  toMerge
      *
      * @return {Collection}
      */
@@ -795,7 +794,7 @@ class Collection implements CollectionInterface
      * @param  {string}   value
      * @param  {string?}  key
      *
-     * @return {array}
+     * @return {Collection}
      */
     pluck(value: string, key?: string): Collection {
         const items = this.filter(item => item[value] !== undefined).toArray();
@@ -1003,7 +1002,7 @@ class Collection implements CollectionInterface
     sort(callback?: any): Collection {
         const collection = [].concat(this.items);
 
-        collection.sort(callback || ((a, b) => a - b))
+        collection.sort(callback || ((a, b) => a - b));
 
         return Collection.make(collection);
     }
@@ -1011,7 +1010,7 @@ class Collection implements CollectionInterface
     /**
      * Sort the collection using the given callback.
      *
-     * @param  any  callback
+     * @param  {any}  callback
      *
      * @return {Collection}
      */
@@ -1099,7 +1098,7 @@ class Collection implements CollectionInterface
     /**
      * Take the first or last {limit} items.
      *
-     * @param  {number}  length
+     * @param  {number}  limit
      *
      * @return {Collection}
      */
@@ -1228,10 +1227,11 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * Apply the callback if the value is truthy.
+     * Apply the callback if the value is `true` state.
      *
      * @param  {any}       value
      * @param  {Function}  callback
+     * @param  {any}       defaultCallback
      *
      * @return {Collection}
      */

@@ -206,11 +206,11 @@ interface CollectionInterface
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param  {any}  key
+     * @param  {any}  keys
      *
      * @return {boolean}
      */
-    has(...key): boolean;
+    has(...keys): boolean;
 
     /**
      * Concatenate values of a given key as a string.
@@ -309,11 +309,11 @@ interface CollectionInterface
     /**
      * Merge the collection with the given items.
      *
-     * @param  {any}  obj
+     * @param  {any}  toMerge
      *
-     * @return {CollectionInterface}
+     * @return {Collection}
      */
-    merge(obj): CollectionInterface;
+    merge(toMerge: any): CollectionInterface;
 
     /**
      * Get the min value of a given key.
@@ -376,7 +376,7 @@ interface CollectionInterface
      * @param  {string}   value
      * @param  {string?}  key
      *
-     * @return {Collection}
+     * @return {CollectionInterface}
      */
     pluck(value: string, key?: string): CollectionInterface;
 
@@ -506,7 +506,7 @@ interface CollectionInterface
     /**
      * Sort the collection using the given callback.
      *
-     * @param  any  callback
+     * @param  {any}  callback
      *
      * @return {CollectionInterface}
      */
@@ -553,7 +553,7 @@ interface CollectionInterface
     /**
      * Take the first or last {limit} items.
      *
-     * @param  {number}  length
+     * @param  {number}  limit
      *
      * @return {CollectionInterface}
      */
@@ -629,8 +629,9 @@ interface CollectionInterface
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  {any}  value
-     * @param  {any}  callback
+     * @param  {any}       value
+     * @param  {Function}  callback
+     * @param  {any}       defaultCallback
      *
      * @return {CollectionInterface}
      */

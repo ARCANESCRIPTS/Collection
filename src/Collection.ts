@@ -1,5 +1,20 @@
 import CollectionInterface from './CollectionInterface';
-import * as _ from 'lodash';
+import _assign from 'lodash/assign';
+import _chunk from 'lodash/chunk';
+import _concat from 'lodash/concat';
+import _difference from 'lodash/difference';
+import _every from 'lodash/every';
+import _filter from 'lodash/filter';
+import _forEach from 'lodash/forEach';
+import _isArray from 'lodash/isArray';
+import _last from 'lodash/last';
+import _mapKeys from 'lodash/mapKeys';
+import _mapValues from 'lodash/mapValues';
+import _shuffle from 'lodash/shuffle';
+import _sum from 'lodash/sum';
+import _sumBy from 'lodash/sumBy';
+import _values from 'lodash/values';
+import _zipObject from 'lodash/zipObject';
 
 class Collection implements CollectionInterface
 {
@@ -70,7 +85,7 @@ class Collection implements CollectionInterface
      */
     chunk(size: number): Collection {
         return Collection.make(
-            _.chunk(this.values().all(), size)
+            _chunk(this.values().all(), size)
         );
     }
 
@@ -82,7 +97,7 @@ class Collection implements CollectionInterface
     collapse(): Collection {
         let items = this.every((item) => Array.isArray(item))
             ? [].concat(...this.items)
-            : _.assign({}, ...this.items);
+            : _assign({}, ...this.items);
 
         return Collection.make(items);
     }
@@ -98,7 +113,7 @@ class Collection implements CollectionInterface
         items = items instanceof Collection ? items.values().toArray() : items;
 
         return Collection.make(
-            _.zipObject(this.items, items)
+            _zipObject(this.items, items)
         );
     }
 
@@ -116,13 +131,13 @@ class Collection implements CollectionInterface
             list = items.toArray();
         }
         else if (typeof items === 'object') {
-            _.forEach(items, function(value) {
+            _forEach(items, function(value) {
                 list.push(value);
             });
         }
 
         return Collection.make(
-            _.concat(this.items, list)
+            _concat(this.items, list)
         );
     }
 
@@ -175,7 +190,7 @@ class Collection implements CollectionInterface
      */
     diff(values: any): Collection {
         return Collection.make(
-            _.difference(this.items, (values instanceof Collection) ? values.toArray() : values)
+            _difference(this.items, (values instanceof Collection) ? values.toArray() : values)
         );
     }
 
@@ -205,7 +220,7 @@ class Collection implements CollectionInterface
         const BreakException = {};
 
         try {
-            _.forEach(this.items, (value, key) => {
+            _forEach(this.items, (value, key) => {
                 if (callback(value, key, this.items) === false)
                     throw BreakException;
             });
@@ -223,7 +238,7 @@ class Collection implements CollectionInterface
      * @return boolean
      */
     every(callback: any): boolean {
-        return _.every(this.items, callback);
+        return _every(this.items, callback);
     }
 
     /**
@@ -253,11 +268,11 @@ class Collection implements CollectionInterface
      */
     filter(callback?: any): Collection {
         return Collection.make(
-            _.filter(this.items, callback || function (item) {
+            _filter(this.items, callback || function (item) {
                     if (item === undefined || item === null)
                         return false;
 
-                    if (_.isArray(item))
+                    if (_isArray(item))
                         return item.length > 0;
 
                     if (typeof item === 'object')
@@ -318,12 +333,12 @@ class Collection implements CollectionInterface
         const flat = items => {
             collection = [];
 
-            if (_.isArray(items)) {
+            if (_isArray(items)) {
                 items.forEach((item) => {
                     if (typeof item === 'string') {
                         collection.push(item);
                     }
-                    else if (_.isArray(item)) {
+                    else if (_isArray(item)) {
                         collection = collection.concat(item);
                     }
                     else {
@@ -338,7 +353,7 @@ class Collection implements CollectionInterface
                     if (typeof items[property] === 'string') {
                         collection.push(items[property]);
                     }
-                    else if (_.isArray(items[property])) {
+                    else if (_isArray(items[property])) {
                         collection = collection.concat(items[property]);
                     }
                     else {
@@ -546,7 +561,7 @@ class Collection implements CollectionInterface
         let items = this.isCallable(callback) ? this.filter(callback) : this;
 
         return items.isArray()
-            ? _.last(items.toArray())
+            ? _last(items.toArray())
             : items.only([items.keys().last()]).all();
     }
 
@@ -582,7 +597,7 @@ class Collection implements CollectionInterface
         return Collection.make(
             this.isArray()
                 ? this.items.map(callback)
-                : _.mapValues(this.items, (value, key) => callback(value, key))
+                : _mapValues(this.items, (value, key) => callback(value, key))
         );
     }
 
@@ -596,7 +611,7 @@ class Collection implements CollectionInterface
     mapWithKeys(callback: any): Collection {
         const collection = {};
 
-        if (_.isArray(this.items)) {
+        if (_isArray(this.items)) {
             this.items.forEach((item) => {
                 const [keyed, value] = callback(item);
                 collection[keyed] = value;
@@ -655,7 +670,7 @@ class Collection implements CollectionInterface
      */
     merge(toMerge: any): Collection {
         return Collection.make(
-            _.isArray(toMerge)
+            _isArray(toMerge)
                 ? this.items.concat(toMerge)
                 : Object.assign({}, this.items, toMerge)
         );
@@ -801,8 +816,8 @@ class Collection implements CollectionInterface
 
         return Collection.make(
             key === undefined
-                ? _.values(_.mapValues(items, value)) // Only values
-                : _.mapValues(_.mapKeys(items, (item, index) => item[key]), value) // Key => Value pair
+                ? _values(_mapValues(items, value)) // Only values
+                : _mapValues(_mapKeys(items, (item, index) => item[key]), value) // Key => Value pair
         );
     }
 
@@ -971,7 +986,7 @@ class Collection implements CollectionInterface
      * @return {Collection}
      */
     shuffle(): Collection {
-        this.items = _.shuffle(this.items);
+        this.items = _shuffle(this.items);
 
         return this;
     }
@@ -1053,7 +1068,7 @@ class Collection implements CollectionInterface
      *
      * @return {Collection}
      */
-    splice(index: number, limit: any, replace: any): Collection {
+    splice(index: number, limit?: any, replace?: any): Collection {
         const slicedCollection = this.slice(index, limit);
 
         this.items = this.diff(slicedCollection.all()).all();
@@ -1088,9 +1103,9 @@ class Collection implements CollectionInterface
      */
     sum(key?: any): number {
         if (key === undefined && this.isArray())
-            return _.sum(this.items);
+            return _sum(this.items);
         else if (this.isCallable(key))
-            return _.sumBy(this.items, key);
+            return _sumBy(this.items, key);
 
         return this.reduce((carry, item) => carry + item[key]);
     }
@@ -1124,12 +1139,12 @@ class Collection implements CollectionInterface
     /**
      * Create a new collection by invoking the callback a given amount of times.
      *
-     * @param  {number}  n
+     * @param  {any|number}  n
      * @param  {any}     callback
      *
      * @return {Collection}
      */
-    static times(n: number, callback?: any): Collection {
+    static times(n: any|number, callback?: any): Collection {
         if (typeof n !== 'number' || n < 1)
             return new Collection;
 

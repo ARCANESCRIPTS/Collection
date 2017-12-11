@@ -1,9 +1,26 @@
 {
-    "verbose": true,
-    "collectCoverage": true,
-    "collectCoverageFrom" : [
-        "**/dist/Collection.js"
+    "testMatch": [
+        "**/test/**/*.(spec|test).(ts|js)"
     ],
-    "coverageDirectory": "./coverage",
-    "coverageReporters": ["json", "lcov", "text"]
+    "moduleFileExtensions": ["ts", "js"],
+    "transform": {
+        "^.+\\.js$": "babel-jest",
+        "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "mapCoverage": true,
+    "transformIgnorePatterns": [
+        "<rootDir>/node_modules/(?!lodash-es)"
+    ],
+    "coveragePathIgnorePatterns": [
+        "<rootDir>/node_modules/",
+        "<rootDir>/test/_data/"
+    ],
+    "globals": {
+        "ts-jest": {
+            "tsConfigFile": "tsconfig.json",
+            "babelConfig": {
+                "presets": ["env"]
+            }
+        }
+    }
 }

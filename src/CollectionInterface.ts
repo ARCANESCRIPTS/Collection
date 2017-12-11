@@ -530,7 +530,7 @@ interface CollectionInterface
      *
      * @return {CollectionInterface}
      */
-    splice(index: number, limit: any, replace: any): CollectionInterface;
+    splice(index: number, limit?: any, replace?: any): CollectionInterface;
 
     /**
      * Split a collection into a certain number of groups.
@@ -567,16 +567,6 @@ interface CollectionInterface
      * @return {CollectionInterface}
      */
     tap(callback): CollectionInterface;
-
-    /**
-     * Create a new collection by invoking the callback a given amount of times.
-     *
-     * @param  {number}  n
-     * @param  {any}     callback
-     *
-     * @return {CollectionInterface}
-     */
-    times(n: number, callback?: any): CollectionInterface;
 
     /**
      * Convert the collection items to array.

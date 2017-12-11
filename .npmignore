@@ -11,4 +11,5 @@ test/
 node_modules/
 .editorconfig
 .travis.yml
+package-lock.json
 yarn.lock

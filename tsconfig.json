@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
-        "module": "es2015",
-        "target": "es2015",
+        "module": "es6",
+        "target": "es6",
         "moduleResolution": "node",
+        "outDir": "build",
         "removeComments": true,
         "isolatedModules": false,
         "experimentalDecorators": true,
@@ -11,21 +12,17 @@
         "noImplicitAny": false,
         "noImplicitUseStrict": false,
         "noLib": false,
+        "noStrictGenericChecks": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "pretty": true,
-        "outDir": "build"
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "lib": [
+            "dom", "es7"
+        ]
     },
     "exclude": [
         "node_modules/*"
-    ],
-    "files": [
-        "typings/index.d.ts",
-        "src/Collection.ts"
-    ],
-    "compileOnSave": false,
-    "buildOnSave": false,
-    "atom": {
-        "rewriteTsconfig": false
-    }
+    ]
 }

@@ -1,4 +1,4 @@
-import Collection from '../dist/Collection';
+import Collection from '../src/Collection';
 import dataset from './fixtures/data';
 
 describe('#all()', () => {
@@ -780,16 +780,18 @@ describe('#macro()', () => {
             return this.map((item) => item.toUpperCase())
         });
 
-        const collection = new Collection(['a', 'b', 'c']);
+        const collectOne:any = new Collection(['a', 'b', 'c']);
 
-        expect(collection.uppercase().all()).toEqual(['A', 'B', 'C']);
-        expect(collection.all()).toEqual(['a', 'b', 'c']);
+        expect(collectOne.uppercase().all()).toEqual(['A', 'B', 'C']);
+        expect(collectOne.all()).toEqual(['a', 'b', 'c']);
 
         Collection.macro('prefix', function (prefix) {
             return this.map((item) => prefix + item);
         });
 
-        expect(new Collection(['a', 'b', 'c']).prefix('xoxo').all()).toEqual(['xoxoa', 'xoxob', 'xoxoc']);
+        const collectTwo:any = new Collection(['a', 'b', 'c']);
+
+        expect(collectTwo.prefix('xoxo').all()).toEqual(['xoxoa', 'xoxob', 'xoxoc']);
     });
 });
 
@@ -1780,20 +1782,20 @@ describe('#where()', () => {
     it('should return everything that matches', () => {
         const collection = new Collection(dataset.products);
 
-        let expected = [
+        let expectedOne = [
             {id: 3, name: 'Product 3', brand: 'Brand 2', price: 200}
         ];
 
-        expect(collection.where('price', 200).all()).toEqual(expected);
-        expect(collection.where('price', '===', 200).all()).toEqual(expected);
+        expect(collection.where('price', 200).all()).toEqual(expectedOne);
+        expect(collection.where('price', '===', 200).all()).toEqual(expectedOne);
 
-        expected = [
+        let expectedTwo = [
             {id: 2, name: 'Product 2', brand: 'Brand 1', price: '200'},
             {id: 3, name: 'Product 3', brand: 'Brand 2', price: 200}
         ];
 
-        expect(collection.where('price', '=', 200).all()).toEqual(expected);
-        expect(collection.where('price', '==', 200).all()).toEqual(expected);
+        expect(collection.where('price', '=', 200).all()).toEqual(expectedTwo);
+        expect(collection.where('price', '==', 200).all()).toEqual(expectedTwo);
 
         expect(collection.all()).toEqual(dataset.products);
 
@@ -1806,14 +1808,14 @@ describe('#where()', () => {
 
         expect(collection.all()).toEqual(dataset.products);
 
-        expected = [
+        let expectedThree = [
             {id: 1, name: 'Product 1', brand: 'Brand 1', price: 100},
             {id: 4, name: 'Product 4', brand: 'Brand 3', price: 300},
             {id: 5, name: 'Product 5', brand: 'Brand 3', price: 300}
         ];
 
-        expect(collection.where('price', '!=', 200).all()).toEqual(expected);
-        expect(collection.where('price', '<>', 200).all()).toEqual(expected);
+        expect(collection.where('price', '!=', 200).all()).toEqual(expectedThree);
+        expect(collection.where('price', '<>', 200).all()).toEqual(expectedThree);
 
         expect(collection.where('price', '<', 100).all()).toEqual([]);
 

@@ -1,6 +1,6 @@
 {
     "name": "laravel-collection",
-    "version": "1.2.0",
+    "version": "1.2.2",
     "description": "A helper inspired from Laravel Collection class",
     "author": "ARCANEDEV",
     "license": "MIT",

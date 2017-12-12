@@ -1,5 +1,4 @@
 var path = require("path");
-var webpack = require("webpack");
 
 var babelOptions = {
     "presets": [
@@ -11,7 +10,8 @@ module.exports = {
     entry: "./src/main.ts",
     output: {
         path: path.resolve(__dirname, "./dist"),
-        filename: "main.js"
+        filename: "main.js",
+        libraryTarget: "umd"
     },
     module: {
         rules: [
